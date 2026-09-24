@@ -1,0 +1,13 @@
+# regenerable machinery: tokenised data, stage/run caches, mid-run checkpoints
+checkpoints/
+data/
+*.pt
+*.bin
+
+# local test runs of the reduced profiles
+outputs/cpu/
+outputs/smoke/
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

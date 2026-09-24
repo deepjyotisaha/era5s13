@@ -1,0 +1,926 @@
+<meta charset="utf-8">
+<title>Reversible 20M Run</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#ffffff; --panel2:#f4f2ee; --ink:#1d1c1a; --ink2:#54514c;
+  --ink3:#7d7972; --line:#e0dcd5; --line2:#cbc5bb;
+  --accent:#8a4b1f; --accent-bg:#fdf2e7; --accent-line:#e6c8a8;
+  --flag:#9a2f2f; --flag-bg:#fdefee; --flag-line:#f0c9c6;
+  --open:#1f5a7a; --open-bg:#eaf4fa; --open-line:#b8d8e8;
+  --ok:#2c6b45; --ok-bg:#ecf6f0; --ok-line:#bfdfcc;
+  --jarg:#5a3a86; --jarg-bg:#f4effb; --jarg-line:#d8c8ee;
+  --c1:#b1521f; --c2:#1f6f8b; --c3:#7a4b9e; --c4:#2c6b45; --grey:#9a968e;
+  --fill1:#f6e4d6; --fill2:#dceef4; --fill3:#ece2f7; --fill4:#dcefe3;
+  --code:#f3f1ec;
+  --mono:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;
+  --serif:Iowan Old Style,Palatino Linotype,Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#15161a; --panel:#1c1e23; --panel2:#23262c; --ink:#e8e6e1; --ink2:#b3b0a9;
+    --ink3:#87847d; --line:#2e3238; --line2:#404650;
+    --accent:#e0a068; --accent-bg:#2a2119; --accent-line:#54402c;
+    --flag:#e8908a; --flag-bg:#2c1c1c; --flag-line:#5a3230;
+    --open:#78c2e8; --open-bg:#16262f; --open-line:#2d4d61;
+    --ok:#7fce9f; --ok-bg:#172519; --ok-line:#2e4a37;
+    --jarg:#c0a4e8; --jarg-bg:#221c2e; --jarg-line:#453660;
+    --c1:#e8a06a; --c2:#6cc0d8; --c3:#c6a0e6; --c4:#7fce9f; --grey:#7a7770;
+    --fill1:#3a2a1e; --fill2:#1d3540; --fill3:#2c2340; --fill4:#1d3628;
+    --code:#22252b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15161a; --panel:#1c1e23; --panel2:#23262c; --ink:#e8e6e1; --ink2:#b3b0a9;
+  --ink3:#87847d; --line:#2e3238; --line2:#404650;
+  --accent:#e0a068; --accent-bg:#2a2119; --accent-line:#54402c;
+  --flag:#e8908a; --flag-bg:#2c1c1c; --flag-line:#5a3230;
+  --open:#78c2e8; --open-bg:#16262f; --open-line:#2d4d61;
+  --ok:#7fce9f; --ok-bg:#172519; --ok-line:#2e4a37;
+  --jarg:#c0a4e8; --jarg-bg:#221c2e; --jarg-line:#453660;
+  --c1:#e8a06a; --c2:#6cc0d8; --c3:#c6a0e6; --c4:#7fce9f; --grey:#7a7770;
+  --fill1:#3a2a1e; --fill2:#1d3540; --fill3:#2c2340; --fill4:#1d3628;
+  --code:#22252b;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);
+  font-size:17px;line-height:1.62;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:44px 16px 120px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 6px;letter-spacing:-.015em}
+h2{font-family:var(--sans);font-size:1.32rem;letter-spacing:-.01em;margin:56px 0 14px;
+  padding-top:18px;border-top:2px solid var(--line2)}
+h3{font-family:var(--sans);font-size:1.05rem;margin:30px 0 10px;letter-spacing:-.005em}
+h4{font-family:var(--sans);font-size:.9rem;margin:20px 0 8px;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:.07em}
+p{margin:0 0 14px}
+a{color:var(--accent);text-underline-offset:2px}
+.sub{color:var(--ink2);font-family:var(--sans);font-size:.94rem;margin-bottom:28px}
+.meta{font-family:var(--sans);font-size:.82rem;color:var(--ink3);
+  border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:34px;line-height:1.6}
+.parthead{font-family:var(--sans);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-line);
+  border-radius:999px;padding:5px 14px;display:inline-block;margin:70px 0 4px}
+code,.mono{font-family:var(--mono);font-size:.87em}
+p code,li code,td code{background:var(--code);padding:1px 5px;border-radius:4px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.65;margin:16px 0}
+ul,ol{margin:0 0 14px;padding-left:24px}
+li{margin:0 0 7px}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin:0 0 20px}
+.toc h4{margin-top:0}
+.toc ul{list-style:none;padding-left:0;margin:0;font-family:var(--sans);font-size:.9rem}
+.toc ul ul{padding-left:18px;margin-top:6px;border-left:1px solid var(--line);font-size:.86rem}
+.toc li{margin:0 0 5px}
+.toc a{text-decoration:none;color:var(--ink2)}
+.toc a:hover{color:var(--accent);text-decoration:underline}
+.toc .tp{color:var(--ink);font-weight:600;margin-top:14px}
+.box{border-radius:9px;padding:15px 18px;margin:20px 0;font-size:.95rem}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.box .lbl{font-family:var(--sans);font-size:.71rem;letter-spacing:.13em;text-transform:uppercase;
+  font-weight:700;display:block;margin-bottom:7px}
+.flag{background:var(--flag-bg);border:1px solid var(--flag-line);border-left:4px solid var(--flag)}
+.flag .lbl{color:var(--flag)}
+.jarg{background:var(--jarg-bg);border:1px solid var(--jarg-line);border-left:4px solid var(--jarg)}
+.jarg .lbl{color:var(--jarg)}
+.open{background:var(--open-bg);border:1px solid var(--open-line);border-left:4px solid var(--open)}
+.open .lbl{color:var(--open)}
+.take{background:var(--ok-bg);border:1px solid var(--ok-line);border-left:4px solid var(--ok)}
+.take .lbl{color:var(--ok)}
+.note{background:var(--panel2);border:1px solid var(--line)}
+.note .lbl{color:var(--ink3)}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-family:var(--sans);font-size:.88rem}
+th{text-align:left;font-weight:600;color:var(--ink2);border-bottom:2px solid var(--line2);
+  padding:8px 10px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:.85rem;white-space:nowrap}
+.hl{background:var(--ok-bg)}
+.tblwrap{overflow-x:auto;margin:18px 0}
+.tblwrap table{margin:0}
+figure{margin:24px 0;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:18px 16px 12px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figcaption{font-family:var(--sans);font-size:.8rem;color:var(--ink3);
+  margin-top:12px;text-align:center;line-height:1.5}
+.svgscroll{overflow-x:auto}
+.svgscroll svg{min-width:560px}
+svg text{font-family:var(--sans)}
+.eq{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent-line);
+  border-radius:8px;padding:12px 18px;margin:18px 0;font-family:var(--mono);
+  font-size:1rem;text-align:center;overflow-x:auto}
+.eq .why{display:block;font-family:var(--sans);font-size:.8rem;color:var(--ink3);margin-top:8px}
+.gloss dt{font-family:var(--sans);font-weight:700;font-size:.92rem;margin-top:14px;color:var(--ink)}
+.gloss dd{margin:3px 0 0;font-size:.95rem;color:var(--ink2)}
+.gloss .src{font-family:var(--sans);font-size:.74rem;color:var(--ink3);font-weight:400}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 20px}
+@media (max-width:720px){.two{grid-template-columns:1fr}}
+.two .side{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+  padding:14px 16px;font-size:.93rem;line-height:1.55}
+.two .side p{margin:0 0 10px}
+.two .side > :last-child{margin-bottom:0}
+.two .said{border-top:4px solid var(--c1)}
+.two .mine{border-top:4px solid var(--c2)}
+.two .lbl{font-family:var(--sans);font-size:.71rem;letter-spacing:.13em;text-transform:uppercase;
+  font-weight:700;display:block;margin-bottom:8px}
+.two .said .lbl{color:var(--c1)}
+.two .mine .lbl{color:var(--c2)}
+.step{display:inline-block;font-family:var(--sans);font-size:.72rem;font-weight:700;letter-spacing:.08em;
+  color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:5px;
+  padding:1px 7px;margin-right:6px;text-transform:uppercase}
+.q{font-family:var(--sans);font-weight:700;font-size:.93rem;margin:0 0 6px;color:var(--open)}
+.opt{font-size:.93rem}
+.opt li{margin-bottom:5px}
+</style>
+
+<style>
+.chip{display:inline-block;font-family:var(--sans);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;border-radius:999px;padding:3px 10px;margin-left:8px;vertical-align:middle}
+.chip.wait{color:var(--open);background:var(--open-bg);border:1px solid var(--open-line)}
+.chip.ready{color:var(--ok);background:var(--ok-bg);border:1px solid var(--ok-line)}
+.chip.block{color:var(--ink3);background:var(--panel2);border:1px solid var(--line)}
+.chip.done{color:var(--bg);background:var(--ok);border:1px solid var(--ok)}
+.rec{font-family:var(--sans);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  color:var(--ok);background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:5px;padding:1px 7px;margin-left:6px}
+</style>
+
+<div class="wrap">
+
+<h1>Session 13 assignment — the build plan</h1>
+<p class="sub">Train a 20M-parameter LLM on 50M tokens, then again with reversibility, then again with reversibility at the largest batch that fits. Report loss, tokens/s and peak memory.</p>
+<p class="meta">
+ERA V5 &middot; Session 13 &middot; working document, started 20 Sep 2026<br>
+<b>Status:</b> <b>experiment complete</b> (23 Sep): the full run passed 12/12 on the T4; results in the <a href="#log">build log</a> and <code>README.md</code>. What is left is yours: the git repo.<br>
+<b>Where things live:</b> <code>session 13/assignment/</code>. The session report is copied into <code>docs/session13_report.html</code>; this plan's analysis is its Part 2.
+</p>
+
+<div class="toc">
+<h4>Contents</h4>
+<ul>
+<li><a href="#brief">1. The brief, and what it really asks</a></li>
+<li><a href="#stages">2. The seven stages</a></li>
+<li><a href="#decisions">3. Decisions I need from you</a></li>
+<li><a href="#runs">4. The four runs</a></li>
+<li><a href="#measure">5. What gets measured</a></li>
+<li><a href="#repo">6. Files and how we work</a></li>
+<li><a href="#log">7. Build log</a></li>
+<li><a href="#code">8. The code, cell by cell, and what to expect</a></li>
+</ul>
+</div>
+
+<h2 id="brief">1. The brief, and what it really asks</h2>
+<div class="two">
+<div class="side said"><span class="lbl">Lesson page, section 18</span>
+<p>Train a 20M LLM for 50M tokens on Google Colab. Fix a batch size you can run.</p>
+<p>Train again with reversibility (report which variant worked: midpoint, euler, etc).</p>
+<p>Train again with reversibility, pushed to the maximum batch size.</p>
+<p>Report final loss, speed (tokens/s), peak memory and other findings.</p></div>
+<div class="side mine"><span class="lbl">What that means in practice</span>
+<p>Four runs of 50M tokens: baseline, two reversible variants at the <b>same</b> batch, then the better variant at its largest batch.</p>
+<p>The interesting number is the <b>batch ratio</b>: how much bigger a batch fits once activations stop being stored. The paper measured 9.88× on an H100.</p>
+<p>The trap: on a 20M model the biggest memory user is often the <b>logits</b>, which reversibility does not touch.</p></div>
+</div>
+
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 178" role="img" aria-label="Estimated per-sequence memory for the three candidate models">
+<text x="10" y="18" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink2)">Estimated memory per sequence (batch of 1), T4, sequence length 512</text>
+<text x="10" y="51" text-anchor="start" font-size="11.5" fill="var(--ink2)">A · 8 × 256, GPT-2 vocab</text>
+<rect x="210.0" y="34" width="29.9" height="24" fill="var(--c2)"/>
+<rect x="239.9" y="34" width="215.7" height="24" fill="var(--c1)"/>
+<text x="463.5624580383301" y="51" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">279 MiB per sequence</text>
+<text x="10" y="89" text-anchor="start" font-size="11.5" fill="var(--ink2)">C · 24 × 256, GPT-2 vocab</text>
+<rect x="210.0" y="72" width="89.6" height="24" fill="var(--c2)"/>
+<rect x="299.6" y="72" width="215.7" height="24" fill="var(--c1)"/>
+<text x="523.3280830383301" y="89" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">347 MiB per sequence</text>
+<text x="10" y="127" text-anchor="start" font-size="11.5" fill="var(--ink2)">D · 16 × 320, 8K vocab</text>
+<rect x="210.0" y="110" width="74.7" height="24" fill="var(--c2)"/>
+<rect x="284.7" y="110" width="35.2" height="24" fill="var(--c1)"/>
+<text x="327.86328125" y="127" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">125 MiB per sequence</text>
+<rect x="210" y="154" width="14" height="10" fill="var(--c2)"/><text x="230" y="163" text-anchor="start" font-size="10.5" fill="var(--ink3)">block activations (reversibility removes these)</text>
+<rect x="470" y="154" width="14" height="10" fill="var(--c1)"/><text x="490" y="163" text-anchor="start" font-size="10.5" fill="var(--ink3)">logits + loss (chunked loss removes these)</text>
+</svg>
+</div>
+<figcaption>Rough estimate: 34 bytes per token per hidden unit per layer for the blocks, about 10 bytes per vocabulary entry per token for the logits and their gradient. With GPT-2's 50,257-token vocabulary the logits dominate, and reversibility cannot touch them.</figcaption>
+</figure>
+
+<p>With GPT-2's vocabulary, one sequence costs about 245 MiB of logits against 102 MiB of block activations (option C). Unless the loss is computed in chunks, or the vocabulary is smaller, reversibility would free the smaller half and the headline result would be "it barely helps" &mdash; a finding about the output layer, not about reversibility.</p>
+
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 344" role="img" aria-label="Estimated maximum batch per candidate model: baseline, baseline with chunked loss, reversible with chunked loss">
+<text x="10" y="18" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink2)">Estimated largest batch that fits a 15 GB T4 (sequence length 512)</text>
+<text x="10" y="50" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">A · 8 × 256, GPT-2 vocab</text>
+<text x="24" y="69" text-anchor="start" font-size="10.5" fill="var(--ink2)">baseline</text>
+<rect x="190" y="56" width="13.1" height="17" rx="2" fill="var(--c1)"/>
+<text x="209.06472919418758" y="69" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">46</text>
+<text x="24" y="91" text-anchor="start" font-size="10.5" fill="var(--ink2)">baseline + chunked loss</text>
+<rect x="190" y="78" width="79.8" height="17" rx="2" fill="var(--c3)"/>
+<text x="275.80845442536327" y="91" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">281</text>
+<text x="24" y="113" text-anchor="start" font-size="10.5" fill="var(--ink2)">reversible + chunked loss</text>
+<rect x="190" y="100" width="211.0" height="17" rx="2" fill="var(--c4)"/>
+<text x="407.0237780713342" y="113" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">743</text>
+<text x="10" y="146" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">C · 24 × 256, GPT-2 vocab</text>
+<text x="24" y="165" text-anchor="start" font-size="10.5" fill="var(--ink2)">baseline</text>
+<rect x="190" y="152" width="10.2" height="17" rx="2" fill="var(--c1)"/>
+<text x="206.224570673712" y="165" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">36</text>
+<text x="24" y="187" text-anchor="start" font-size="10.5" fill="var(--ink2)">baseline + chunked loss</text>
+<rect x="190" y="174" width="31.8" height="17" rx="2" fill="var(--c3)"/>
+<text x="227.8097754293263" y="187" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">112</text>
+<text x="24" y="209" text-anchor="start" font-size="10.5" fill="var(--ink2)">reversible + chunked loss</text>
+<rect x="190" y="196" width="207.9" height="17" rx="2" fill="var(--c4)"/>
+<text x="403.8996036988111" y="209" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">732</text>
+<text x="10" y="242" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">D · 16 × 320, 8K vocab</text>
+<text x="24" y="261" text-anchor="start" font-size="10.5" fill="var(--ink2)">baseline</text>
+<rect x="190" y="248" width="29.3" height="17" rx="2" fill="var(--c1)"/>
+<text x="225.25363276089828" y="261" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">103</text>
+<text x="24" y="283" text-anchor="start" font-size="10.5" fill="var(--ink2)">baseline + chunked loss</text>
+<rect x="190" y="270" width="42.3" height="17" rx="2" fill="var(--c3)"/>
+<text x="238.31836195508586" y="283" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">149</text>
+<text x="24" y="305" text-anchor="start" font-size="10.5" fill="var(--ink2)">reversible + chunked loss</text>
+<rect x="190" y="292" width="430.0" height="17" rx="2" fill="var(--c4)"/>
+<text x="626.0" y="305" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">1514</text>
+<text x="10" y="330" text-anchor="start" font-size="10.5" fill="var(--ink3)">Estimates only, to size the experiment. Step 3 measures the real numbers by binary search on actual steps.</text>
+</svg>
+</div>
+<figcaption>The gap between the first and last bar is what the assignment is asking you to measure. Option D shows it most clearly; option A has too few layers for reversibility to save much, and its baseline is limited by logits rather than by activations.</figcaption>
+</figure>
+
+<div class="box flag"><span class="lbl">Flag — "maximum batch" runs into a second limit</span>
+<p>The token budget is fixed at 50M. A batch of 1514 sequences of 512 tokens is 775k tokens per step, so the whole run would be about 64 optimizer steps. The model would hardly train, and the final loss would be poor for a reason that has nothing to do with reversibility.</p>
+<p>Three honest ways to handle it, your call in decision 4: report the true maximum and explain the step count; cap the batch so the run still takes a sensible number of steps; or hold the batch and spend the freed memory on a longer sequence instead.</p>
+</div>
+
+<h2 id="stages">2. The seven stages</h2>
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 206" role="img" aria-label="Seven stages: decisions, data, reversible block, gates, memory probe, four runs, report">
+<defs><marker id="pm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/></marker></defs>
+<rect x="10" y="16" width="160" height="70" rx="7" fill="var(--open-bg)" stroke="var(--open)"/>
+<text x="22" y="36" text-anchor="start" font-size="10.5" font-weight="700" fill="var(--open)">S0</text>
+<text x="22" y="54" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink)">Your decisions</text>
+<text x="22" y="72" text-anchor="start" font-size="9.5" fill="var(--ink2)">the 5 open calls below</text>
+<path d="M172 51 L178 51" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#pm)"/>
+<rect x="182" y="16" width="160" height="70" rx="7" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="194" y="36" text-anchor="start" font-size="10.5" font-weight="700" fill="var(--line2)">S1</text>
+<text x="194" y="54" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink)">Data + baseline model</text>
+<text x="194" y="72" text-anchor="start" font-size="9.5" fill="var(--ink2)">tokenise 50M, cache it</text>
+<path d="M344 51 L350 51" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#pm)"/>
+<rect x="354" y="16" width="160" height="70" rx="7" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="366" y="36" text-anchor="start" font-size="10.5" font-weight="700" fill="var(--line2)">S2</text>
+<text x="366" y="54" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink)">Reversible block</text>
+<text x="366" y="72" text-anchor="start" font-size="9.5" fill="var(--ink2)">custom backward pass</text>
+<path d="M516 51 L522 51" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#pm)"/>
+<rect x="526" y="16" width="160" height="70" rx="7" fill="var(--flag-bg)" stroke="var(--flag)"/>
+<text x="538" y="36" text-anchor="start" font-size="10.5" font-weight="700" fill="var(--flag)">S3</text>
+<text x="538" y="54" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink)">GATES</text>
+<text x="538" y="72" text-anchor="start" font-size="9.5" fill="var(--ink2)">grads match autograd</text>
+<rect x="10" y="112" width="160" height="70" rx="7" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="22" y="132" text-anchor="start" font-size="10.5" font-weight="700" fill="var(--line2)">S4</text>
+<text x="22" y="150" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink)">Memory probe</text>
+<text x="22" y="168" text-anchor="start" font-size="9.5" fill="var(--ink2)">largest batch that fits</text>
+<path d="M172 147 L178 147" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#pm)"/>
+<rect x="182" y="112" width="160" height="70" rx="7" fill="var(--fill2)" stroke="var(--c2)"/>
+<text x="194" y="132" text-anchor="start" font-size="10.5" font-weight="700" fill="var(--c2)">S5</text>
+<text x="194" y="150" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink)">Four runs</text>
+<text x="194" y="168" text-anchor="start" font-size="9.5" fill="var(--ink2)">50M tokens each, on Colab</text>
+<path d="M344 147 L350 147" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#pm)"/>
+<rect x="354" y="112" width="160" height="70" rx="7" fill="var(--fill4)" stroke="var(--c4)"/>
+<text x="366" y="132" text-anchor="start" font-size="10.5" font-weight="700" fill="var(--c4)">S6</text>
+<text x="366" y="150" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink)">Report</text>
+<text x="366" y="168" text-anchor="start" font-size="9.5" fill="var(--ink2)">README from summary.json</text>
+<path d="M90 88 L90 104" stroke="var(--ink3)" stroke-width="1.4" marker-end="url(#pm)"/>
+<text x="10" y="196" text-anchor="start" font-size="11" fill="var(--ink3)">S1–S4 are cheap and fail fast. Nothing long runs until the gates pass.</text>
+</svg>
+</div>
+<figcaption>Where we are: S0. Everything below waits on the five open calls.</figcaption>
+</figure>
+
+<h2 id="decisions">3. Decisions I need from you</h2>
+<p>Everything else follows from these. Where I have a recommendation it is marked; the reasoning is in Part 2 of the report.</p>
+
+<h3>Settled already <span class="chip done">decided</span></h3>
+<ul>
+<li><b>Hardware:</b> Colab T4, free tier. That fixes fp16 with a loss scaler (no bf16), sequence length 512, and a ceiling of about 15 GB for the batch search.</li>
+<li><b>Dropout is 0 in every run</b>, including the baseline.</li>
+<li><b>The memory saving comes from a custom backward pass</b>, not from the equation.</li>
+</ul>
+<h4>Why dropout has to be 0</h4>
+<p>Dropout is a training trick. Each time a layer runs, it picks a few of the numbers at random and sets them to zero, so the model cannot lean on any single one. Which numbers get zeroed changes every time.</p>
+<p>That breaks a reversible model. Its backward pass does not read stored activations; it <b>runs the layer again</b> and subtracts the answer to get back to the earlier state. For that to work, the layer must give the <b>same answer both times</b>. With dropout on, the second run zeroes different numbers, so it returns a different answer, and the state we rebuild is wrong.</p>
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 275" role="img" aria-label="Dropout gives a different mask on the rebuild, so the rebuilt state is wrong">
+<defs><marker id="dm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/></marker></defs>
+<text x="10" y="18" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink2)">Same layer, run twice, with dropout switched on</text>
+<text x="10" y="34" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--c2)">forward pass: dropout zeroes the 2nd number</text>
+<rect x="10" y="40" width="52" height="30" rx="4" fill="var(--fill2)" stroke="var(--c2)"/>
+<text x="36" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">2</text>
+<rect x="74" y="40" width="52" height="30" rx="4" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="100" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink3)">0</text>
+<text x="100" y="86" text-anchor="middle" font-size="9.5" fill="var(--flag)">dropped</text>
+<rect x="138" y="40" width="52" height="30" rx="4" fill="var(--fill2)" stroke="var(--c2)"/>
+<text x="164" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">1</text>
+<rect x="202" y="40" width="52" height="30" rx="4" fill="var(--fill2)" stroke="var(--c2)"/>
+<text x="228" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">1</text>
+<text x="276" y="60" text-anchor="start" font-size="12.5" font-weight="700" fill="var(--ink)">sum = 4</text>
+<text x="360" y="60" text-anchor="start" font-size="11.5" fill="var(--ink2)">so the layer returns 4</text>
+<text x="10" y="120" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--c1)">backward pass rebuilds it: dropout zeroes the 1st instead</text>
+<rect x="10" y="126" width="52" height="30" rx="4" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="36" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink3)">0</text>
+<text x="36" y="172" text-anchor="middle" font-size="9.5" fill="var(--flag)">dropped</text>
+<rect x="74" y="126" width="52" height="30" rx="4" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="100" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">3</text>
+<rect x="138" y="126" width="52" height="30" rx="4" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="164" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">1</text>
+<rect x="202" y="126" width="52" height="30" rx="4" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="228" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">1</text>
+<text x="276" y="146" text-anchor="start" font-size="12.5" font-weight="700" fill="var(--ink)">sum = 5</text>
+<text x="360" y="146" text-anchor="start" font-size="11.5" fill="var(--ink2)">so the layer returns 5</text>
+<text x="10" y="216" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">Rebuilding the earlier state: earlier = later − layer output</text>
+<text x="10" y="238" text-anchor="start" font-size="12" fill="var(--c2)">what the forward pass really did:  10 − 4 = 6</text>
+<text x="10" y="258" text-anchor="start" font-size="12" fill="var(--c1)">what the backward pass computes: 10 − 5 = 5</text>
+<text x="360" y="248" text-anchor="start" font-size="12" font-weight="700" fill="var(--flag)">wrong by 1, with no error message</text>
+</svg>
+</div>
+<figcaption>Dropout picks different numbers to zero each time it runs. The rebuild needs the layer to give the same answer twice, so dropout has to be off.</figcaption>
+</figure>
+<p>Nothing crashes when this happens. The gradients are simply a little wrong, the loss curve looks plausible, and you would never know. So dropout is off.</p>
+<p><b>Why the baseline also runs with dropout off:</b> if only one of the two runs used dropout, part of the difference in loss would come from dropout rather than from reversibility, and we could not say which. Turning it off everywhere keeps the comparison clean. We lose nothing, because we read 50M fresh tokens once and never repeat them, and dropout mainly helps when a model sees the same text many times.</p>
+<div class="box note"><span class="lbl">Worth knowing</span><p>This is a limit of how these methods are written, not a law of nature. You could save the random seed for each layer and replay the same pattern on the rebuild, which is what PyTorch's activation checkpointing does. But the reversibility paper and the instructor's Lightning LM report both require dropout 0, so we follow them instead of inventing a variant.</p></div>
+<h4>Why the saving needs a custom backward pass</h4>
+<p>When you write normal PyTorch code, PyTorch quietly keeps every intermediate number that the backward pass will need. That stored pile <b>is</b> the activation memory, and it grows with every layer you add.</p>
+<p>So if you write the reversible rule as ordinary code, you get the reversible maths and none of the benefit. PyTorch still keeps everything, for all 16 layers, plus the extra states the rule needs. Memory goes up, not down. This is the easiest way to get a null result on this assignment.</p>
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 250" role="img" aria-label="Plain PyTorch keeps all 16 layers in memory; a custom backward pass keeps one">
+<defs><marker id="cm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/></marker></defs>
+<text x="10" y="18" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink2)">16 layers: what is being held in memory at the end of the forward pass</text>
+<text x="10" y="36" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--c1)">written as ordinary PyTorch code</text>
+<rect x="10" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="23" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="40" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="53" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="70" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="83" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="100" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="113" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="130" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="143" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="160" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="173" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="190" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="203" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="220" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="233" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="250" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="263" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="280" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="293" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="310" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="323" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="340" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="353" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="370" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="383" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="400" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="413" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="430" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="443" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<rect x="460" y="44" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c1)"/>
+<text x="473" y="63" text-anchor="middle" font-size="11" fill="var(--c1)">●</text>
+<text x="500" y="63" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">all 16 kept: nothing is saved</text>
+<text x="10" y="110" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--c4)">wrapped in a custom backward pass</text>
+<rect x="10" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="40" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="70" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="100" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="130" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="160" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="190" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="220" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="250" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="280" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="310" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="340" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="370" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="400" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="430" y="118" width="26" height="28" rx="3" fill="var(--panel2)" stroke="var(--line)"/>
+<rect x="460" y="118" width="26" height="28" rx="3" fill="var(--fill2)" stroke="var(--c4)"/>
+<text x="473" y="137" text-anchor="middle" font-size="11" fill="var(--c4)">●</text>
+<text x="500" y="137" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">1 layer + the 2 end states</text>
+<text x="10" y="200" text-anchor="start" font-size="11" fill="var(--ink3)">Filled = this layer's working numbers are still in GPU memory.</text>
+<text x="10" y="220" text-anchor="start" font-size="11" fill="var(--ink2)">The reversible rule alone does not free anything. The freeing happens because we tell PyTorch not to keep the graph,</text>
+<text x="10" y="238" text-anchor="start" font-size="11" fill="var(--ink2)">then rebuild and re-run one layer at a time during the backward pass.</text>
+</svg>
+</div>
+<figcaption>Same maths in both rows. Only the second one saves memory, and it costs one extra run of each layer.</figcaption>
+</figure>
+<p>The saving comes from taking over the backward pass ourselves, with a <code>torch.autograd.Function</code>:</p>
+<ol>
+<li>The <b>forward pass</b> runs with graph-building switched off, so nothing is stored. It keeps only the two states at the ends of the stack.</li>
+<li>The <b>backward pass</b> walks down from the top layer. For each layer it rebuilds that layer's input from the state above, runs that one layer again with gradients switched on, takes the gradients, and then throws that layer's working numbers away.</li>
+</ol>
+<p>Peak memory is then the two end states plus <b>one</b> layer, instead of all 16. The price is that every layer runs a second time, which is where the 30&ndash;50% slowdown comes from.</p>
+<p><b>How we check it is right.</b> Two gates run before any long training:</p>
+<ul>
+<li><b>Gradient gate:</b> run the same model twice, once the ordinary way and once through our custom backward pass, and check the gradients match. Done in double precision on the CPU, where they should agree to many decimal places.</li>
+<li><b>Reconstruction gate:</b> compare each rebuilt state against the real one and report how far it drifts in 16-bit arithmetic. This tells us whether the residual stream needs to stay in 32-bit.</li>
+</ul>
+<p>If either gate fails, nothing below it can be trusted, so we fix it before spending time on Colab.</p>
+
+<h3>1 · What "20M" means <span class="chip done">decided 20 Sep</span></h3>
+<div class="box note"><span class="lbl">How to read a shape like "16 × 320"</span>
+<p><b>16 layers, each carrying a token as 320 numbers.</b> Same notation as the lesson's 96 × 5,120 model. The first number is <b>depth</b> (how many transformer blocks the token passes through); the second is <b>width</b>, the hidden size, the length of the vector that represents one token between layers &mdash; the residual stream that reversibility rebuilds.</p>
+<p>Everything inside a block follows from the width: attention splits it into heads (320 = 5 heads × 64; the lesson's 5,120 = 40 × 128), and the feed-forward expands it about fourfold and back (320 → 1,280 → 320; the lesson's 5,120 → 16,384 → 5,120). The weights in one block come to roughly 12 × width²: Q, K, V and O are width × width each (4 × width²), and the two feed-forward matrices are width × 4·width each (8 × width²). So 12 × 320² ≈ 1.23M per block, × 16 layers = 19.7M.</p>
+<p>The shape does not include the sequence length (512, settled) or the batch size (the thing being measured). Those describe the data flowing through, not the model.</p>
+<p><b>Why depth is the lever here:</b> reversibility removes one stored activation per layer, so 24 layers have three times as much to give back as 8. Width and vocabulary matter for a different reason: the vocabulary sets how big the logits are, and logits are the one thing reversibility cannot shrink.</p></div>
+<div class="tblwrap"><table>
+<tr><th>option</th><th>shape</th><th class="num">blocks</th><th class="num">embedding</th><th class="num">total</th><th class="num">est. batch, baseline</th><th class="num">est. batch, reversible</th></tr>
+<tr><td>A</td><td>8 × 256, GPT-2 vocab</td><td class="num">6.3M</td><td class="num">12.9M</td><td class="num">19.2M</td><td class="num">281</td><td class="num">743</td></tr>
+<tr><td>C</td><td>24 × 256, GPT-2 vocab</td><td class="num">18.9M</td><td class="num">12.9M</td><td class="num">31.8M</td><td class="num">112</td><td class="num">732</td></tr>
+<tr class="hl"><td>D <span class="chip done">chosen</span></td><td>16 × 320, 8K vocab</td><td class="num">19.7M</td><td class="num">2.6M</td><td class="num">22.3M</td><td class="num">149</td><td class="num">1514</td></tr>
+</table></div>
+<div class="box take"><span class="lbl">Decided — 20 Sep</span><p><b>Option D: 16 layers × width 320, with an 8K-token tokenizer trained on the corpus.</b> 22.3M parameters in total and 19.7M of them in the blocks, so it reads as "20M" either way. The small vocabulary keeps the logits out of the measurement, which is what makes the batch comparison about reversibility.</p></div>
+<p><b>D</b> is closest to "20M parameters" as a whole, puts almost all of them in the transformer blocks where reversibility acts, and needs a tokenizer trained on the corpus first (a few minutes). <b>C</b> avoids the tokenizer step and is deeper, which suits reversibility, but two thirds of its memory is vocabulary-related and it needs the chunked loss to be worth measuring. <b>A</b> is the literal reading of the brief and the least interesting: 8 layers give reversibility almost nothing to save.</p>
+
+<h3>2 · Dataset <span class="chip done">decided 20 Sep</span></h3>
+<ul class="opt">
+<li><b>FineWeb</b> (sample-10BT) <span class="rec">recommended</span> — real web text, the same source as your Session 9 harness, closest to what V5 trains on. Streams in a few minutes and caches to Drive.</li>
+<li><b>TinyStories</b> — simple generated stories. A 20M model learns them well, so the loss curves separate cleanly and the variant comparison is easier to read. Less realistic.</li>
+</ul>
+<p>Either way the 50M tokens are tokenised once into a flat <code>uint16</code> file (about 100 MB), with a fixed held-out slice for validation, and every run sees the identical token order.</p>
+<div class="box take"><span class="lbl">Decided — 20 Sep</span>
+<p><b>FineWeb.</b> Real web text, the same source as session 9.</p>
+<p><b>What this choice affects, in plain terms.</b> The headline results of this assignment are memory and speed, and those do not depend on the text at all. The text only affects the loss numbers. FineWeb is hard for a 20M model: many topics, names and numbers, so the loss stays high and the curve is fairly flat. TinyStories, the other candidate, is much easier, so its loss drops further and the curves for different runs separate more clearly.</p>
+<p>We accept the harder read on the loss curves because all four runs see the <b>identical</b> tokens in the identical order, so any gap between them still comes from the model and not from the data. If the two reversible variants end up too close to call, the report will say exactly that, and we can add a short TinyStories run as a tie-breaker.</p>
+<p><b>Worth remembering:</b> loss values only make sense next to the text and tokenizer that produced them. These numbers will not be comparable with the loss numbers in your sessions 9&ndash;11, which used the GPT-2 tokenizer on different text.</p></div>
+
+<h3>3 · What the second reversible run should be <span class="chip done">decided 21 Sep</span></h3>
+<div class="two">
+<div class="side said"><span class="lbl">Already settled by the class</span>
+<p><b>The technique is reversibility with the midpoint rule.</b> The lesson page covers only midpoint. In class the instructor said "we are going to be using midpoint", that they found it "works much better", and his Lightning LM models use the reversible midpoint stack.</p>
+<p>So midpoint is fixed. It is your main reversible run.</p></div>
+<div class="side mine"><span class="lbl">Left open by the class</span>
+<p><b>What the comparison run is.</b> The brief asks you to "report which variant worked for you (mid-point, euler, etc)", and in class he said to test Euler and midpoint and judge by the loss curves.</p>
+<p>But he never said what the Euler variant is, and plain Euler is the ordinary residual rule, which cannot be run backwards. That one word is the only gap.</p></div>
+</div>
+<p>So this decision is not "pick a technique". It is narrower: <b>what should the second, "Euler" run actually be?</b> The simplest way to close it is one line to the instructor: "By Euler, do you mean the bootstrap or a separate integrator, and where does a = 0.5 enter the update?"</p>
+<p>The brief says "mid-point, euler, etc". Plain Euler is the ordinary residual block, which is <em>not</em> reversible, so "Euler" has to mean one of two things:</p>
+<ul class="opt">
+<li><b>Midpoint vs the Hamiltonian / symplectic-Euler coupling</b> <span class="rec">recommended</span> — two genuinely different reversible architectures. The second is the RevNet-style two-stream rule and is fairly called an Euler variant.</li>
+<li><b>Midpoint with two bootstraps</b> (Euler kick vs no kick) — this is the Lightning LM config naming, but it compares a starting detail, not two architectures.</li>
+<li><b>Add leapfrog</b> as a third run (the paper's second-order rule), about 15 extra minutes.</li>
+</ul>
+<h4>What Lightning LM actually did</h4>
+<p>Lightning LM is the instructor's own model family, and it is what he showed at the end of the session. Its report (<a href="https://lightninglm.theschoolofai.in/">lightninglm.theschoolofai.in</a>) has a whole section called "Reversibility as the Backbone". Useful facts for us:</p>
+<div class="tblwrap"><table>
+<tr><th>model</th><th>reversible?</th><th>note</th></tr>
+<tr><td>2B dense</td><td><b>no</b></td><td>at that size activation memory was not the limit, so it would only have cost speed</td></tr>
+<tr><td>5B mixture-of-experts</td><td>yes</td><td>reversible midpoint stack</td></tr>
+<tr><td>9B</td><td>yes</td><td>130.9 GB per GPU at 8K context, against an estimated 550&ndash;650 GB without it</td></tr>
+<tr><td>120B</td><td>yes</td><td>plus quantised experts, to fit one 8-GPU node</td></tr>
+</table></div>
+<p><b>What it covers:</b> the whole stack of layers, and their extra next-token-prediction head has its own reversible sub-stack. <b>What still has to be stored:</b> the mixture-of-experts routing buffers, framework overhead such as communication buffers and attention scratch space, and the weights and optimizer state, which are handled by sharding and quantisation instead. This is the "not everything is reversible" point he made in class about router state.</p>
+<p><b>Their memory formula is constant in the number of layers</b> and grows only with batch × sequence length × width. That is exactly what the optional depth probe in decision 5 would show at small scale.</p>
+<div class="tblwrap"><table>
+<tr><th>integrator setting</th><th>what Lightning LM used</th><th>the library's default</th></tr>
+<tr><td>step size</td><td class="num">0.25</td><td class="num">0.05</td></tr>
+<tr><td>coefficient a</td><td class="num">0.5</td><td class="num">0.95</td></tr>
+<tr><td>injected noise</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>bootstrap (how the second starting state is made)</td><td>euler</td><td>no_kick</td></tr>
+<tr class="hl"><td>dropout</td><td class="num">0</td><td>required for correctness</td></tr>
+</table></div>
+<div class="box flag"><span class="lbl">The gap I keep hitting</span>
+<p>The site writes the update as <code>next = x + &delta;(x + &frac12;&middot;&delta;(x))</code>. That is the textbook midpoint step, and on its own it is <b>not</b> reversible: you still cannot get <code>x</code> back from <code>next</code>. The reversible version is the two-state form from the paper, <code>next = previous + 2h × block(current)</code>. Where their coefficient <code>a = 0.5</code> enters is not written down in anything I can read, and I could not find the library.</p>
+<p>So either you can get the library or the formula through the course, or I implement the paper's two-state midpoint and treat the step size as the one knob, chosen by a short sweep over a few hundred steps.</p></div>
+<p>So: do you have the course's reversible library, or the exact form of the blend coefficient <code>a = 0.5</code> that Lightning LM uses? Neither the paper nor the public report pages give the equation it enters, and I would rather use the real thing than guess. Without it I implement the paper's plain midpoint and choose the step size with a short sweep.</p>
+
+<div class="box take"><span class="lbl">Decided — 21 Sep</span>
+<p><b>Run B: midpoint. Run C: the two-stream rule (symplectic Euler).</b> The report will say plainly that we read "Euler" as the symplectic-Euler coupling, because plain Euler is not reversible.</p>
+<p><b>Side check, no extra full run:</b> midpoint with the Euler start against midpoint with the default start, over a few hundred steps. That covers the other reading of "Euler", so the report answers whichever one the instructor meant.</p>
+<p><b>How midpoint is built:</b> the paper's two-state form, next = previous + 2h × block(current), with the step size h chosen by a short sweep, because the Lightning LM library and the place where its a = 0.5 enters are not public. If the instructor answers the one-line question, we switch to his exact rule before the full runs.</p></div>
+<div class="box take"><span class="lbl">Amended — 23 Sep, after the smoke run</span>
+<p><b>Run B's start is now chosen by the side check, with a rule fixed in advance:</b> the Euler start stays unless the plain start is better by more than 0.02 nats over 300 steps. A near-tie keeps Lightning LM's setting.</p>
+<p><b>Why the change.</b> The smoke run showed two things. The Euler start cost midpoint one stored layer of memory (fixed: it is now recomputed), and in 60 short steps the plain start trained better by 0.054. Sixty steps is too few to trust, so rather than switch on weak evidence or ignore it, the full-length side check decides. Because the start no longer affects memory, the choice now affects only how well the model trains, and the report can state plainly whether the start mattered.</p></div>
+<h3>4 · Batch sizes, learning rate and weight decay <span class="chip done">decided 21 Sep</span></h3>
+<p>This decision has four small parts. They all come from one fact: <b>the number of training tokens is fixed at 50M</b>.</p>
+<h4>The fact that drives everything</h4>
+<p>One training step reads one batch. So the number of steps is fixed by the batch size:</p>
+<p class="eq">steps = 50,000,000 tokens ÷ (batch × 512 tokens per sequence)</p>
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 296" role="img" aria-label="Number of training steps for different batch sizes with 50 million tokens">
+<text x="10" y="18" text-anchor="start" font-size="12" font-weight="700" fill="var(--ink2)">Optimizer steps for 50M tokens at sequence length 512</text>
+<text x="10" y="47" text-anchor="start" font-size="11" fill="var(--ink2)">batch 32</text>
+<rect x="220" y="32" width="400.0" height="20" rx="2" fill="var(--c4)"/>
+<text x="626.0" y="47" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">3,052 steps</text>
+<text x="10" y="77" text-anchor="start" font-size="11" fill="var(--ink2)">batch 64</text>
+<rect x="220" y="62" width="200.0" height="20" rx="2" fill="var(--c4)"/>
+<text x="426.0" y="77" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">1,526 steps</text>
+<text x="10" y="107" text-anchor="start" font-size="11" fill="var(--ink2)">batch 128</text>
+<rect x="220" y="92" width="100.0" height="20" rx="2" fill="var(--c4)"/>
+<text x="326.0" y="107" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">763 steps</text>
+<text x="10" y="137" text-anchor="start" font-size="11" fill="var(--ink2)">batch 150 (est. baseline max)</text>
+<rect x="220" y="122" width="85.3" height="20" rx="2" fill="var(--c4)"/>
+<text x="311.3333333333333" y="137" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">651 steps</text>
+<text x="10" y="167" text-anchor="start" font-size="11" fill="var(--ink2)">batch 240</text>
+<rect x="220" y="152" width="53.3" height="20" rx="2" fill="var(--c4)"/>
+<text x="279.3333333333333" y="167" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">407 steps</text>
+<text x="10" y="197" text-anchor="start" font-size="11" fill="var(--ink2)">batch 512</text>
+<rect x="220" y="182" width="25.0" height="20" rx="2" fill="var(--flag)"/>
+<text x="251.0" y="197" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">191 steps</text>
+<text x="10" y="227" text-anchor="start" font-size="11" fill="var(--ink2)">batch 1,024</text>
+<rect x="220" y="212" width="12.5" height="20" rx="2" fill="var(--flag)"/>
+<text x="238.5" y="227" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">95 steps</text>
+<text x="10" y="257" text-anchor="start" font-size="11" fill="var(--ink2)">batch 1,500 (est. reversible max)</text>
+<rect x="220" y="242" width="8.5" height="20" rx="2" fill="var(--flag)"/>
+<text x="234.53333333333333" y="257" text-anchor="start" font-size="11" font-weight="700" fill="var(--ink)">65 steps</text>
+<line x1="272.4" y1="26" x2="272.4" y2="272" stroke="var(--flag)" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="276.4288" y="286" text-anchor="start" font-size="10.5" fill="var(--flag)">about 400 steps: below this, too few to train</text>
+</svg>
+</div>
+<figcaption>Green: enough steps to train. Red: too few. The estimated reversible maximum (about 1,500) lands at about 64 steps.</figcaption>
+</figure>
+<p>Bigger batches mean fewer steps. Each step is a better estimate of the right direction, but there are fewer of them, and a model needs enough steps to learn. Below a few hundred steps, a model this size barely gets going, whatever its memory tricks.</p>
+<h4>Part a · The baseline batch (runs A, B and C)</h4>
+<p>The brief says "fix a batch size you can run". Two ways to read it:</p>
+<ul class="opt">
+<li><b>A comfortable batch, such as 32</b> <span class="rec">recommended</span> &mdash; about 3,050 steps, so all three runs train properly and their loss curves are easy to compare. It also leaves plenty of room to show how much bigger reversibility lets the batch go.</li>
+<li><b>The baseline's own maximum</b> (about 150 by my estimate) &mdash; the fastest baseline in tokens per second, but only about 650 steps, and very little room left above it before run D hits the step problem below.</li>
+</ul>
+<h4>Part b · What "maximum batch" means for run D</h4>
+<p>My estimate for the reversible model's true maximum is about 1,500 sequences, which leaves only <b>about 64 steps</b>. Run D would then show a worse loss for a reason that has nothing to do with reversibility.</p>
+<ul class="opt">
+<li><b>True maximum</b> &mdash; push until memory runs out and train there. Honest and loud about memory, but the loss result is mostly about having too few steps.</li>
+<li><b>Measure the true maximum, train at a capped batch</b> <span class="rec">recommended</span> &mdash; find the real maximum with a short probe (no training, so it costs a minute), report it as the memory result, and train run D at the largest batch that still leaves at least about 400 steps (around 240 sequences). You get both answers: how far memory goes, and what a much bigger batch does to training.</li>
+<li><b>Spend the memory on longer sequences instead</b> &mdash; keep batch 32 and raise the sequence length to 2,048 or 4,096. A different way to show the saving; it changes the brief's question, so I would only add it as an extra.</li>
+</ul>
+<h4>Part c · Learning rate for the bigger batch</h4>
+<p>With fewer, better-averaged steps, the same learning rate moves the model a shorter total distance. The usual fix for Adam-style optimizers is to raise the learning rate by the <b>square root</b> of how much bigger the batch got: 8 times the batch means about 2.8 times the learning rate.</p>
+<ul class="opt">
+<li><b>Square-root scaling</b> <span class="rec">recommended</span> &mdash; standard, one number, no extra runs.</li>
+<li><b>Keep the same learning rate</b> &mdash; simplest, but run D will probably under-train, and you cannot tell whether that is the batch or the learning rate.</li>
+<li><b>Short sweep</b> &mdash; try 3 learning rates for a few hundred steps each and pick the best. Most reliable, about 15 extra minutes.</li>
+</ul>
+<h4>Part d · Weight decay</h4>
+<p>Weight decay pulls every weight a tiny step towards zero at each update, which keeps weights from growing too large. The instructor said reversible runs should not use it. The paper and the Lightning LM report do not say that; they only require dropout 0. It does not break the rebuild, because it happens in the optimizer after the backward pass.</p>
+<ul class="opt">
+<li><b>Same value in all four runs, such as 0.1</b> <span class="rec">recommended</span> &mdash; the usual setting, and fair because every run gets it.</li>
+<li><b>0 in all four runs</b> &mdash; follows the instructor's advice exactly, and still fair. On 50M tokens the difference will be small.</li>
+</ul>
+<div class="box take"><span class="lbl">Decided — 21 Sep, and why</span>
+<p><b>a · Batch 32 for runs A, B and C.</b> At 32 sequences each run takes about 3,050 steps, which is plenty for a 20M model to train properly, so the three loss curves can be compared fairly. It also leaves a lot of memory unused on purpose: that unused room is exactly what run D will fill, which makes the effect of reversibility easy to see. If we started at the baseline's own maximum (about 150), there would be almost no room left above it before running into the step problem.</p>
+<p><b>b · Run D: measure the true maximum, but train at a capped batch of about 240.</b> The true maximum (about 1,500 by estimate) would leave only about 65 steps, so its loss would mostly show "not enough steps", not "reversibility". So we split the question in two. A one-minute probe, with no training, finds the real largest batch for both the baseline and the reversible model; the ratio between them is the memory result, the same kind of number as the paper's 9.88&times;. Run D then trains at the largest batch that still gives about 400 steps (around 240 sequences, roughly 8&times; the baseline). That shows what a much bigger batch does to speed and loss, without the step count ruining the result.</p>
+<p><b>c · Learning rate scaled by the square root of the batch increase.</b> A bigger batch means fewer steps, so with the same learning rate the model moves less far in total and ends up under-trained. Raising the learning rate by the square root of the batch ratio is the standard correction for Adam-style optimizers: about 2.8&times; for an 8&times; batch. It is one number with no extra runs, and it means a worse loss in run D can be put down to the batch, not to a learning rate we forgot to adjust.</p>
+<p><b>d · Weight decay 0.1 in all four runs.</b> It is the usual setting, and giving every run the same value keeps the comparison fair. The instructor advised against weight decay for reversible runs, but neither the paper nor the Lightning LM report requires it, and it cannot break the rebuild because it happens in the optimizer, after the backward pass. The report will mention his advice, and if the reversible runs misbehave, weight decay 0 is the first thing to try.</p></div>
+<h3>5 · Extras and repo <span class="chip done">decided 21 Sep</span></h3>
+<div class="box take"><span class="lbl">Decided — 21 Sep, and why</span>
+<p><b>Memory-vs-depth probe: yes.</b> We build the ordinary and the reversible model at 8, 16, 24 and 32 layers, run one training step on each, and record peak memory. No training, so it takes a few minutes. It is the clearest single picture of what reversibility does: the ordinary model's memory climbs with every layer added, while the reversible model's stays nearly flat. That is exactly the property in Lightning LM's memory formula, and it answers the brief's "other findings" directly.</p>
+<p><b>Cost comparison: yes.</b> Avnish suggested it in class and the instructor agreed. Colab's free tier has no price per run, so the report turns each run's measured GPU time into money using a public T4 hourly rate, clearly marked as an estimate. It costs nothing extra once the timings exist, and it puts the 30&ndash;50% slowdown in terms anyone can weigh: cost per run, and cost to reach the baseline's final loss.</p>
+<p><b>Repo: you will create it later and handle all git work.</b> I only build the code base and keep it ready to push: the notebook source, tools, docs (including the session report), and outputs folders.</p></div>
+
+<h2 id="runs">4. The four runs</h2>
+<div class="tblwrap"><table>
+<tr><th>run</th><th>model</th><th>batch</th><th>tokens</th><th>what it answers</th></tr>
+<tr><td>A</td><td>baseline (ordinary residual)</td><td class="num">32</td><td class="num">50M</td><td>reference loss, tokens/s, peak memory</td></tr>
+<tr><td>B</td><td>reversible, midpoint</td><td class="num">32</td><td class="num">50M</td><td>cost of reversibility at equal batch</td></tr>
+<tr><td>C</td><td>reversible, two-stream (symplectic Euler)</td><td class="num">32</td><td class="num">50M</td><td>which variant trains better</td></tr>
+<tr class="hl"><td>D</td><td>reversible, winner of B vs C</td><td class="num">240</td><td class="num">50M</td><td>what the freed memory buys; learning rate × &radic;(batch ratio)</td></tr>
+<tr><td>probe</td><td>baseline and reversible</td><td>largest that fits</td><td class="num">none</td><td>the true memory ratio, no training</td></tr>
+</table></div>
+<p>Same seed, same data order and same schedule across A, B and C; only the architecture changes. Measured on the T4: 99 minutes for everything (see the <a href="#log">build log</a>). The first estimate was roughly 10&ndash;20 minutes per run, so about an hour for all four, plus tokenising. The probe in S4 will replace that estimate with a measurement before we commit.</p>
+
+<h2 id="measure">5. What gets measured</h2>
+<div class="tblwrap"><table>
+<tr><th>metric</th><th>how</th></tr>
+<tr><td>final loss</td><td>smoothed training loss at 50M tokens, plus validation loss on a fixed held-out slice at regular token intervals</td></tr>
+<tr><td>tokens/s</td><td>timed with CUDA sync, warm-up and evaluation excluded</td></tr>
+<tr><td>peak memory</td><td><code>torch.cuda.max_memory_allocated</code> per run, plus a breakdown: state, block activations, logits</td></tr>
+<tr><td>batch ratio</td><td>largest batch reversible ÷ largest batch baseline, the paper's 9.88× equivalent</td></tr>
+<tr><td>time to a target loss</td><td>wall-clock to reach the baseline's final loss — the fair speed comparison when batch sizes differ</td></tr>
+<tr><td>reconstruction error</td><td>per layer, from the gate: how far the rebuilt activations drift in fp16</td></tr>
+</table></div>
+<div class="box take"><span class="lbl">Rule carried over from earlier sessions</span><p>Every sentence in the write-up is generated from the measured numbers. Where a result could go either way, the notebook prints the conclusion from the data rather than me writing it in advance.</p></div>
+
+<h2 id="repo">6. Files and how we work</h2>
+<pre>session 13/assignment/
+  assignment_plan.html     this document
+  docs/session13_report.html   the session report (lesson + transcript analysis)
+  notebook_src.py          source of truth (percent-format script)   built, tested on CPU
+  session13_reversible.ipynb   built from it, opened in Colab        built
+  tools/py2ipynb.py        script → notebook converter               ready
+  data/                    tokenised corpus cache
+  outputs/                 logs, plots, summary.json, RESULTS.md
+  README.md                write-up, generated from summary.json   done
+  tools/make_readme.py     writes the README, checks its numbers   ready
+  .gitignore               keeps caches, data and test runs out of the repo</pre>
+<p>The loop is the one from sessions 9&ndash;12: I build and debug <code>notebook_src.py</code> locally, convert it to a notebook, and you run it on Colab (Runtime → Run all) and send back <code>outputs/</code> plus the executed notebook. A stage cache keyed on the code and config means a Colab disconnect resumes instead of retraining. Gate cells stop the run if the gradients or reconstruction are wrong.</p>
+
+<h2 id="log">7. Build log</h2>
+<h3>23 Sep · the full run: the results</h3>
+<p>The full experiment ran on the Colab T4 in <b>99 minutes</b> and passed <b>12 of 12 checks</b>. After the account switch it was run again from the copied Drive cache (the v4 notebook): every stage reloaded and every number came out identical. The full write-up is in <code>README.md</code>, generated from <code>outputs/summary.json</code>.</p>
+<div class="tblwrap"><table>
+<tr><th>run</th><th class="num">batch</th><th class="num">steps</th><th class="num">final val loss</th><th class="num">tokens / s</th><th class="num">peak memory</th><th class="num">cost</th></tr>
+<tr><td>A · ordinary</td><td class="num">32</td><td class="num">3,051</td><td class="num"><b>4.1145</b></td><td class="num">53,446</td><td class="num">4,051 MiB</td><td class="num">$0.09</td></tr>
+<tr><td>B · midpoint, h = 0.25, plain start</td><td class="num">32</td><td class="num">3,051</td><td class="num"><b>4.2042</b></td><td class="num">41,109</td><td class="num">1,144 MiB</td><td class="num">$0.12</td></tr>
+<tr><td>C · two-stream, h = 1.0</td><td class="num">32</td><td class="num">3,051</td><td class="num"><b>4.2515</b></td><td class="num">41,499</td><td class="num">1,165 MiB</td><td class="num">$0.12</td></tr>
+<tr><td>D · midpoint, largest batch used</td><td class="num">240</td><td class="num">406</td><td class="num"><b>5.8695</b></td><td class="num">41,975</td><td class="num">3,774 MiB</td><td class="num">$0.11</td></tr>
+</table></div>
+<figure><div class="svgscroll"><svg viewBox="0 0 700 196" role="img" aria-label="Peak memory and tokens per second for runs A to D">
+<text x="10" y="18" font-size="12" font-weight="700" fill="var(--ink2)">What each run cost in memory, and how fast it went</text>
+<text x="150" y="38" font-size="11" font-weight="700" fill="var(--ink2)">peak memory (MiB) &mdash; shorter is better</text>
+<text x="470" y="38" font-size="11" font-weight="700" fill="var(--ink2)">tokens per second &mdash; longer is better</text>
+<text x="10" y="61" font-size="11.5" font-weight="700" fill="var(--ink)">A · ordinary</text>
+<text x="10" y="73" font-size="10" fill="var(--ink3)">batch 32</text>
+<rect x="150" y="50" width="170.0" height="16" rx="3" fill="var(--c4)" opacity=".85"/>
+<text x="326.0" y="62" font-size="10.5" fill="var(--ink)">4,051</text>
+<rect x="470" y="50" width="170.0" height="16" rx="3" fill="var(--c4)" opacity=".85"/>
+<text x="646.0" y="62" font-size="10.5" fill="var(--ink)">53,446</text>
+<text x="10" y="91" font-size="11.5" font-weight="700" fill="var(--ink)">B · midpoint</text>
+<text x="10" y="103" font-size="10" fill="var(--ink3)">batch 32</text>
+<rect x="150" y="80" width="48.0" height="16" rx="3" fill="var(--c1)" opacity=".85"/>
+<text x="204.0" y="92" font-size="10.5" fill="var(--ink)">1,144</text>
+<rect x="470" y="80" width="130.8" height="16" rx="3" fill="var(--c1)" opacity=".85"/>
+<text x="606.8" y="92" font-size="10.5" fill="var(--ink)">41,109</text>
+<text x="10" y="121" font-size="11.5" font-weight="700" fill="var(--ink)">C · two-stream</text>
+<text x="10" y="133" font-size="10" fill="var(--ink3)">batch 32</text>
+<rect x="150" y="110" width="48.9" height="16" rx="3" fill="var(--c2)" opacity=".85"/>
+<text x="204.9" y="122" font-size="10.5" fill="var(--ink)">1,165</text>
+<rect x="470" y="110" width="132.0" height="16" rx="3" fill="var(--c2)" opacity=".85"/>
+<text x="608.0" y="122" font-size="10.5" fill="var(--ink)">41,499</text>
+<text x="10" y="151" font-size="11.5" font-weight="700" fill="var(--ink)">D · midpoint</text>
+<text x="10" y="163" font-size="10" fill="var(--ink3)">batch 240</text>
+<rect x="150" y="140" width="158.4" height="16" rx="3" fill="var(--c3)" opacity=".85"/>
+<text x="314.4" y="152" font-size="10.5" fill="var(--ink)">3,774</text>
+<rect x="470" y="140" width="133.5" height="16" rx="3" fill="var(--c3)" opacity=".85"/>
+<text x="609.5" y="152" font-size="10.5" fill="var(--ink)">41,975</text>
+<text x="10" y="186" font-size="10.5" fill="var(--ink3)">Batch 32 for A, B and C, so their memory compares directly. D spends the freed memory on a batch of 240.</text>
+</svg></div></figure>
+<h4>What the numbers say, in plain words</h4>
+<ul>
+<li><b>Memory: the promise holds.</b> At the same batch the reversible models used about 3.5&times; less memory. Adding a layer costs the ordinary model 197.1 MiB (its stored working numbers) but a reversible model only 14.3 MiB (that layer's weights and Adam state). At 32 layers: 7,206 MiB against 1,374 MiB.</li>
+<li><b>Largest batch that fits:</b> 144 ordinary, 896 midpoint (6.22&times;), 912 two-stream (6.33&times;). The Euler-start fix closed most of midpoint's gap to two-stream (664 in the smoke run).</li>
+<li><b>Speed: the price is smaller than the paper says.</b> Midpoint ran 23% slower and two-stream 22% slower than run A, against the paper's 30&ndash;50%.</li>
+<li><b>Which variant worked: midpoint.</b> It finished 0.0472 nats lower than the other. The side check picked the <b>plain start</b> for midpoint: it beat the Euler start by 0.1381 nats, well past the 0.02 rule fixed in advance.</li>
+<li><b>But both reversible runs trained a little worse than run A:</b> 0.0898 and 0.1370 nats behind, and none reached run A's final loss. With one seed per run we cannot say how much of that is noise, and the cause (the different update rule, a step size tuned on 300 steps, or 16-bit rebuilding error) was not separated.</li>
+<li><b>Run D: a bigger batch bought nothing on the T4.</b> At batch 240 it ran at 41,975 tokens/s, the same as run B, because the T4 is already fully busy at batch 32. So the same 50M tokens meant 7.5&times; fewer steps and a much higher final loss (5.8695). The freed memory is worth more on a deeper model or longer sequences.</li>
+</ul>
+<div class="box take"><span class="lbl">How the decisions held up</span>
+<p><b>Decision 3 (amended):</b> the side-check rule did its job: the evidence was clear, so run B switched to the plain start. <b>Run D's cap at 240</b> was right to keep the run meaningful: at the full 896 it would have had only about 109 steps. <b>The smoke run</b> paid for itself: it found the crash in run D and both measurement errors before the 1 hour 40 minute run.</p></div>
+
+<h3>23 Sep · both fixes made and tested</h3>
+<div class="tblwrap"><table>
+<tr><th>change</th><th>where in the code</th><th>how it was checked</th></tr>
+<tr><td>the Euler start is recomputed in the backward pass instead of stored</td><td>Cell 6, <code>GPT.states()</code></td><td>counting the bytes PyTorch keeps for the backward pass: midpoint with the Euler start now keeps 777.5 KiB, the same as two-stream; the only extra is the step's own input (128 KiB), against about 2,400 KiB for a stored layer. Gate A still matches plain PyTorch to 1.8e-16, and run B's loss is identical to before.</td></tr>
+<tr><td>the memory probe takes two steps, so Adam's running averages are counted</td><td>Cell 12, <code>_try_step()</code></td><td>runs on the GPU only; the full run's probe will show it</td></tr>
+<tr><td>the side check picks run B's start, by the rule above</td><td>Cell 11, <code>_sweep()</code>; used in Cells 12 and 13</td><td>CPU run: tie of 0.001 nats, so the Euler start was kept, as the rule says</td></tr>
+</table></div>
+<p><b>The price of the first fix:</b> recomputing the start means one extra layer of work in the backward pass. In the 16-layer model that is roughly 2&ndash;3% slower for midpoint with the Euler start, against a saving of one layer's worth of memory. The CPU run passed 9 of 9 checks (3 need a GPU).</p>
+<p><b>Why no second smoke run:</b> the new GPU code paths are small, and Gate C exercises the recomputed Euler start under 16-bit arithmetic before any training starts. If something does fail, finished work stays cached on Drive.</p>
+
+<h3>23 Sep · the smoke run passed: what it measured</h3>
+<p>With the fix in place, the whole notebook ran on the Colab T4 and passed <b>12 of 12 checks</b>. These are smoke numbers (2M tokens per run), so the losses mean little, but the speed and memory numbers are real.</p>
+<div class="tblwrap"><table>
+<tr><th>run, batch 32</th><th class="num">tokens / second</th><th class="num">vs ordinary</th><th class="num">peak memory</th><th class="num">vs ordinary</th></tr>
+<tr><td>A ordinary</td><td class="num">54,743</td><td class="num">&mdash;</td><td class="num">4,051 MiB</td><td class="num">&mdash;</td></tr>
+<tr><td>B midpoint</td><td class="num">41,612</td><td class="num">24% slower</td><td class="num">1,328 MiB</td><td class="num">0.33&times;</td></tr>
+<tr><td>C two-stream</td><td class="num">43,291</td><td class="num">21% slower</td><td class="num">1,165 MiB</td><td class="num">0.29&times;</td></tr>
+</table></div>
+<div class="tblwrap"><table>
+<tr><th>memory probe</th><th class="num">ordinary</th><th class="num">midpoint</th><th class="num">two-stream</th></tr>
+<tr><td>largest batch that fits</td><td class="num">144</td><td class="num">664 (4.6&times;)</td><td class="num">912 (6.3&times;)</td></tr>
+<tr><td>peak memory at 8 layers, batch 32</td><td class="num">2,377 MiB</td><td class="num">1,116 MiB</td><td class="num">954 MiB</td></tr>
+<tr><td>peak memory at 16 layers, batch 32</td><td class="num">3,878 MiB</td><td class="num">1,154 MiB</td><td class="num">991 MiB</td></tr>
+<tr><td>extra memory per added layer</td><td class="num">187.6 MiB</td><td class="num">4.7 MiB</td><td class="num">4.7 MiB</td></tr>
+</table></div>
+<p><b>What this already shows.</b> The reversible models slow down by about a fifth, not the 30&ndash;50% the paper estimates. Doubling the depth from 8 to 16 layers adds 1,500 MiB to the ordinary model and under 40 MiB to the reversible ones: memory that does not grow with depth, measured.</p>
+<p><b>The gates on the GPU.</b> In 16-bit arithmetic the rebuilt states drift more than on the CPU: the error is tiny at the top of the stack (4e-8) and grows to about 2e-3 by the bottom layer, for both stacks. The likely reason is that the GPU does not produce bit-identical results when it re-runs a layer during the backward pass, so each rebuild adds a small error that builds up going down. The gradients still agree with plain PyTorch to a cosine of 0.99995, so training is not harmed, but it is worth a line in the report, and it is the first thing to suspect if the reversible runs trail run A in the full run.</p>
+<h4>Two things the numbers exposed</h4>
+<p><b>1 · Midpoint pays for one extra layer, and it is my implementation, not midpoint.</b> Midpoint uses exactly 162.9 MiB more than two-stream, at both 8 and 16 layers. A gap that does not grow with depth is one stored layer. It is the Euler start: the single ordinary step that makes midpoint's second starting state runs outside the reversible stack, through normal PyTorch, so it stores that layer's working numbers. That is why midpoint fits 664 and two-stream 912. <b>Proposed fix:</b> re-run that one step during the backward pass instead of storing it, the same trick as the rest of the stack.</p>
+<p><b>2 · The probe is slightly optimistic.</b> Each extra reversible layer adds exactly 4.7 MiB, which is that layer's weights and nothing else. The probe measures the first training step, and Adam creates its two running averages only at the end of that step, after the peak. In real training they already exist, adding 171 MiB. <b>Proposed fix:</b> the probe takes two steps and measures the second. Run D is unaffected (240 is far below the limit), but the reported largest batch and the per-layer figure will be honest.</p>
+<p><b>Side check, midpoint start:</b> the plain start beat the Euler start by 0.054 in these 60-step runs. That is too short to trust, but together with point 1 it bears on decision 3, so it is raised below as an open question.</p>
+<p><b>Full-run time, from measured speeds:</b> about 15 minutes for run A, 19&ndash;20 each for B, C and D, 12 for the sweep and 8 for the probe: <b>about 1 hour 40 minutes</b> in total.</p>
+
+<h3>23 Sep · the first smoke run found a bug, now fixed</h3>
+<p><b>What happened.</b> Everything up to run D worked on the T4: the data, the three gates, the step-size sweep, the memory probe, and runs A, B and C. Run D then crashed with <code>IndexError: list index out of range</code> the first time it tried to print its progress.</p>
+<p><b>Why.</b> The training loop wrote down the training loss every 25 steps, and evaluated the model every 0.5M tokens (2.5M in the full run). Each evaluation line prints the latest training loss. Run D's batch is 3 times bigger, so it reached its first evaluation at step 10, before step 25, when no training loss had been written yet. The CPU test never hit this, because there the evaluation always came after the first log step. The full run's run D would have crashed the same way at step 20, so this is exactly what the smoke run is for.</p>
+<p><b>The fix.</b> The training loss is now also written down at every evaluation, and the print never reads an empty list. Tested on the CPU with the log interval set so that every evaluation comes first, which is the exact failing condition: run D finishes, all checks pass, and the validation losses are identical to before, so the fix changes only what is logged.</p>
+<p><b>What a re-run costs.</b> The data, the gates and the memory probe reload from Drive. The sweep and runs A to D are retrained, because their cache fingerprint includes the training loop's code and that code changed. In smoke mode that is a few minutes.</p>
+<p><b>A first real number, as a side effect.</b> The crash message shows run D's memory limit as 816, which is 90% of the largest batch the probe found for the winning reversible variant. That puts its largest batch at 912 sequences. My estimate was about 1,500, so the real headroom is smaller than estimated. The full probe table will show why.</p>
+
+<h3>21 Sep · the code is built and tested on the CPU</h3>
+<p>The notebook source (<code>notebook_src.py</code>) covers every stage from S1 to S6's raw results. It runs in three modes: <b>cpu</b> (a tiny model on tiny data, to test the code on a laptop), <b>smoke</b> (the real model and data, about 2M tokens per run) and <b>full</b> (the experiment). The whole CPU mode ran end to end locally: 9 of 9 checks passed, 3 skipped because they need a GPU.</p>
+<div class="tblwrap"><table>
+<tr><th>check</th><th>what it tests</th><th>measured</th></tr>
+<tr><td>Gate A</td><td>our backward pass gives the same gradients as plain PyTorch, fp64</td><td class="num">1e-16 relative difference</td></tr>
+<tr><td>Gate B</td><td>the planted dropout bug is caught</td><td class="num">4&ndash;12% difference: caught</td></tr>
+<tr><td>Gate C</td><td>rebuilt states stay close to the real ones, fp32, 8 layers</td><td class="num">2e-7 relative error</td></tr>
+<tr><td>resume</td><td>kill a run halfway, restart, and it continues from its checkpoint</td><td class="num">same final loss to 7 digits</td></tr>
+<tr><td>data</td><td>FineWeb streams, the tokenizer trains, the round trip is exact</td><td>works</td></tr>
+</table></div>
+<p><b>What the CPU cannot test:</b> fp16 autocast, the memory probe, and the loss scaler working with our backward pass. Those only run on a GPU, which is exactly what the smoke run is for.</p>
+<p><b>Two things added while building,</b> both following from earlier decisions:</p>
+<ul>
+<li><b>The loss is computed in slices</b> of 8,192 tokens, recomputed during the backward pass. Without it, at run D's batch of about 240, the scores over the vocabulary alone would take several GB and would drown out the memory we want to measure. Every run uses it, so the comparison stays fair.</li>
+<li><b>The stream between layers is kept in fp32</b>; only the matrix work runs in fp16. Rebuilding a state means subtracting, and fp16 subtraction would lose too much accuracy over 16 layers.</li>
+</ul>
+<p>The parameter count is 22.5M rather than the 22.3M quoted in decision 1: the earlier figure left out the position table and the LayerNorm weights.</p>
+
+<div class="box take"><span class="lbl">Done — what is left is yours</span>
+<ol>
+<li>The deliverables are in <code>session 13/assignment/</code>: the executed notebook <code>session13_reversible_v4_executed_full.ipynb</code>, <code>outputs/</code> (summary, logs, four figures, the zip) and <code>README.md</code>.</li>
+<li>If <code>outputs/summary.json</code> ever changes, run <code>python tools/make_readme.py</code> to rewrite the README; it checks its own numbers against the summary.</li>
+<li>Create the repo and push. <code>.gitignore</code> already keeps checkpoints, data and test runs out.</li>
+</ol></div>
+
+<h2 id="code">8. The code, cell by cell, and what to expect</h2>
+<p>This section is your guide before you press Run. It follows the notebook <code>session13_reversible.ipynb</code> from top to bottom. For each group of cells it says what the code does, points to the functions doing the work, shows what the output should look like, and gives a rough time on a T4.</p>
+<div class="box note"><span class="lbl">Where the times come from</span><p>The full-run times were estimated from speeds measured in the smoke run on 23 Sep. The full run itself then took 99 minutes end to end, in line with the estimate of about 1 hour 40 minutes. The smoke run's own time is still an estimate, because its total was not recorded.</p></div>
+
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 330" role="img" aria-label="Notebook map: eight groups of cells from setup to results, with the three gates as stop points">
+<defs><marker id="wm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink3)"/></marker></defs>
+<text x="10" y="18" font-size="12" font-weight="700" fill="var(--ink2)">The notebook in eight groups (cell numbers in brackets)</text>
+<g font-size="11.5">
+<rect x="10" y="34" width="160" height="62" rx="7" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="22" y="54" font-weight="700" fill="var(--ink)">1 · Setup [1–3]</text><text x="22" y="72" font-size="10.5" fill="var(--ink2)">mode, settings, Drive,</text><text x="22" y="86" font-size="10.5" fill="var(--ink2)">cache</text>
+<rect x="182" y="34" width="160" height="62" rx="7" fill="var(--fill1)" stroke="var(--c1)"/>
+<text x="194" y="54" font-weight="700" fill="var(--ink)">2 · Data [4]</text><text x="194" y="72" font-size="10.5" fill="var(--ink2)">FineWeb, tokenizer,</text><text x="194" y="86" font-size="10.5" fill="var(--ink2)">50.5M tokens, once</text>
+<rect x="354" y="34" width="160" height="62" rx="7" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="366" y="54" font-weight="700" fill="var(--ink)">3 · Model [5–6]</text><text x="366" y="72" font-size="10.5" fill="var(--ink2)">three stacks and the</text><text x="366" y="86" font-size="10.5" fill="var(--ink2)">custom backward pass</text>
+<rect x="526" y="34" width="164" height="62" rx="7" fill="var(--flag-bg)" stroke="var(--flag)"/>
+<text x="538" y="54" font-weight="700" fill="var(--flag)">4 · Gates [7–9]</text><text x="538" y="72" font-size="10.5" fill="var(--ink2)">stop the notebook</text><text x="538" y="86" font-size="10.5" fill="var(--ink2)">if anything is wrong</text>
+<rect x="10" y="150" width="160" height="62" rx="7" fill="var(--panel2)" stroke="var(--line2)"/>
+<text x="22" y="170" font-weight="700" fill="var(--ink)">5 · Loop + sweep [10–11]</text><text x="22" y="188" font-size="10.5" fill="var(--ink2)">short runs choose the</text><text x="22" y="202" font-size="10.5" fill="var(--ink2)">step size h</text>
+<rect x="182" y="150" width="160" height="62" rx="7" fill="var(--fill3)" stroke="var(--c3)"/>
+<text x="194" y="170" font-weight="700" fill="var(--ink)">6 · Probe [12]</text><text x="194" y="188" font-size="10.5" fill="var(--ink2)">largest batch, and</text><text x="194" y="202" font-size="10.5" fill="var(--ink2)">memory vs depth</text>
+<rect x="354" y="150" width="160" height="62" rx="7" fill="var(--fill2)" stroke="var(--c2)"/>
+<text x="366" y="170" font-weight="700" fill="var(--ink)">7 · Runs [13–14]</text><text x="366" y="188" font-size="10.5" fill="var(--ink2)">A, B, C at batch 32,</text><text x="366" y="202" font-size="10.5" fill="var(--ink2)">then D at ~240</text>
+<rect x="526" y="150" width="164" height="62" rx="7" fill="var(--fill4)" stroke="var(--c4)"/>
+<text x="538" y="170" font-weight="700" fill="var(--ink)">8 · Results [15–17]</text><text x="538" y="188" font-size="10.5" fill="var(--ink2)">table, plots, checks,</text><text x="538" y="202" font-size="10.5" fill="var(--ink2)">zip to download</text>
+</g>
+<g stroke="var(--ink3)" stroke-width="1.4" fill="none" marker-end="url(#wm)">
+<path d="M172 65 L180 65"/><path d="M344 65 L352 65"/><path d="M516 65 L524 65"/>
+<path d="M608 98 L608 124 L90 124 L90 146"/>
+<path d="M172 181 L180 181"/><path d="M344 181 L352 181"/><path d="M516 181 L524 181"/>
+</g>
+<text x="10" y="248" font-size="11" fill="var(--ink2)">Every finished stage and run is saved to Drive with a fingerprint of its settings and its code.</text>
+<text x="10" y="266" font-size="11" fill="var(--ink2)">Run all again after a disconnect: finished work reloads in seconds, a half-finished run resumes from its checkpoint.</text>
+<text x="10" y="292" font-size="11" fill="var(--flag)" font-weight="700">If a gate fails, the notebook stops with a FAIL line. Nothing after it would be trustworthy.</text>
+<text x="10" y="310" font-size="11" fill="var(--flag)">Send me the output of that cell; do not work around it.</text>
+</svg>
+</div>
+<figcaption>Groups 2 and 7 take almost all the time. Group 2 happens only once: the full run reuses the smoke run's data.</figcaption>
+</figure>
+
+<figure>
+<div class="svgscroll">
+<svg viewBox="0 0 700 170" role="img" aria-label="Estimated time: smoke run about 30 minutes, mostly data; full run about 100 minutes, mostly training">
+<text x="10" y="18" font-size="12" font-weight="700" fill="var(--ink2)">Estimated minutes on a T4 (1 minute = 5 px)</text>
+<text x="10" y="54" font-size="11.5" fill="var(--ink)" font-weight="700">smoke</text>
+<rect x="90" y="38" width="5" height="26" fill="var(--grey)"/>
+<rect x="95" y="38" width="75" height="26" fill="var(--c1)"/><text x="132" y="55" text-anchor="middle" font-size="10" fill="var(--bg)">data 15</text>
+<rect x="170" y="38" width="10" height="26" fill="var(--flag)"/>
+<rect x="180" y="38" width="15" height="26" fill="var(--grey)"/>
+<rect x="195" y="38" width="30" height="26" fill="var(--c3)"/>
+<rect x="225" y="38" width="15" height="26" fill="var(--c2)"/>
+<text x="248" y="55" font-size="11.5" font-weight="700" fill="var(--ink)">about 30 min</text>
+<text x="10" y="104" font-size="11.5" fill="var(--ink)" font-weight="700">full</text>
+<rect x="90" y="88" width="5" height="26" fill="var(--grey)"/>
+<rect x="95" y="88" width="10" height="26" fill="var(--flag)"/>
+<rect x="105" y="88" width="60" height="26" fill="var(--grey)"/><text x="135" y="105" text-anchor="middle" font-size="10" fill="var(--bg)">sweep</text>
+<rect x="165" y="88" width="40" height="26" fill="var(--c3)"/><text x="185" y="105" text-anchor="middle" font-size="10" fill="var(--bg)">probe</text>
+<rect x="205" y="88" width="375" height="26" fill="var(--c2)"/><text x="392" y="105" text-anchor="middle" font-size="10" fill="var(--bg)">runs A, B, C, D: about 75 (measured speeds)</text>
+<text x="588" y="105" font-size="11.5" font-weight="700" fill="var(--ink)">~100 min</text>
+<g font-size="10" fill="var(--ink3)">
+<rect x="90" y="134" width="10" height="10" fill="var(--c1)"/><text x="104" y="143">data (once)</text>
+<rect x="170" y="134" width="10" height="10" fill="var(--flag)"/><text x="184" y="143">gates</text>
+<rect x="225" y="134" width="10" height="10" fill="var(--grey)"/><text x="239" y="143">setup / sweep</text>
+<rect x="320" y="134" width="10" height="10" fill="var(--c3)"/><text x="334" y="143">probe</text>
+<rect x="380" y="134" width="10" height="10" fill="var(--c2)"/><text x="394" y="143">training runs</text>
+</g>
+</svg>
+</div>
+<figcaption>Full run: 50M tokens at the smoke run's measured speeds, about 15 minutes for run A and 19&ndash;20 for each reversible run, plus the sweep and the probe. The reversible runs measured 21&ndash;24% slower per token than run A, less than the 30&ndash;50% the paper estimates.</figcaption>
+</figure>
+
+<h3>Group 1 · Setup (Cells 1–3) · under a minute</h3>
+<p><b>Cell 1</b> holds the one switch you touch: <code>MODE = "smoke"</code>. It installs <code>tokenizers</code> and <code>datasets</code> if missing, and decides the <b>profile</b>: <code>smoke</code> or <code>full</code> on a GPU, <code>cpu</code> on a laptop (a tiny version used only to test the code).</p>
+<p><b>Cell 2</b> holds every setting in a few small blocks (<code>ModelCfg</code>, <code>TrainCfg</code>, <code>DataCfg</code>, <code>SweepCfg</code>, <code>ProbeCfg</code>) and the pass/fail thresholds (<code>Thresholds</code>), written down before anything is measured.</p>
+<p><b>Cell 3</b> mounts Google Drive (Colab asks your permission once) and creates two folders: <code>outputs/</code>, what you download, and <code>cache/</code>, machinery you can delete. The function <code>stage()</code> saves each finished step with a fingerprint of its settings and its code, so an edited cell recomputes instead of replaying an old answer.</p>
+<pre>+----------------------------------------------------------------+
+|  NOTEBOOK v1  -  Session 13, reversible 20M model              |
+|  profile: smoke   device: cuda   gpu: Tesla T4                 |
+|  SMOKE TEST: real model and data, ~2M tokens per run.          |
++----------------------------------------------------------------+
+model   : 16 layers x width 320, 5 heads, vocab 8,192, sequence 512
+          about 22.5M parameters (19.7M in the blocks)
+training: 2.0M tokens, batch 32 -> 122 steps, lr 0.001, weight decay 0.1
+outputs : /content/drive/MyDrive/era5_session13/outputs/smoke</pre>
+<p><b>Check:</b> the box must say <code>device: cuda</code> and <code>Tesla T4</code>. If it says <code>cpu</code>, the runtime has no GPU: Runtime → Change runtime type → T4 GPU.</p>
+
+<h3>Group 2 · Data (Cell 4) · about 10&ndash;20 minutes, once</h3>
+<p><code>build_data()</code> streams FineWeb and does four things in order:</p>
+<ol>
+<li>keeps the first ~6M characters of documents aside as <b>validation</b> text, never trained on;</li>
+<li>trains a byte-pair tokenizer with 8,192 tokens on the next ~40M characters;</li>
+<li>turns the validation documents into 1M tokens (<code>val.bin</code>) and the training documents into 50.5M tokens (<code>train.bin</code>, about 100 MB), each stored as 16-bit numbers;</li>
+<li>saves everything to Drive with a <code>meta.json</code>, so this never runs again.</li>
+</ol>
+<p><code>Windows</code> then cuts the training tokens into 98,632 pieces of 513 tokens and shuffles their order once with a fixed seed. Every run reads the pieces in that same order, so all four runs see identical data.</p>
+<pre>source fineweb: ... validation docs, ... docs (40.0M chars) for the tokenizer
+tokenizer trained: vocabulary 8,192
+training tokens  : 50,500,000  (98,632 windows of 512+1)
+validation tokens: 1,000,000  (separate documents)
+chars per token  : about 4
+round trip       : ... tokens -> 'Reversible networks rebuild their activations instead of storing them.'</pre>
+<p><b>Check:</b> the round trip must print the sentence back exactly. A warning about "unauthenticated requests to the HF Hub" is harmless; it only means slower downloads.</p>
+
+<h3>Group 3 · The model (Cells 5–6) · instant</h3>
+<p><b>Cell 5</b> defines one transformer block. Its method <code>Block.delta(x)</code> is the <code>f(x)</code> from the lesson: everything one block adds to the stream. <code>GPT.states()</code> then stacks 16 blocks in one of three ways:</p>
+<pre># run A, ordinary:          x = x + f(x)
+# run B, midpoint:          a, b = b, a + 2h * f(b)
+# run C, two-stream:        q = q + h * Attn(p);  p = p + h * MLP(q)</pre>
+<p>All three start from the same weights (<code>make_model()</code> resets the seed first), so differences come only from the stacking. <code>chunked_ce()</code> computes the loss in slices of 8,192 tokens so the vocabulary scores never all exist at once.</p>
+<p><b>Cell 6</b> is where the memory saving lives. <code>MidpointStack</code> and <code>TwoStreamStack</code> each have their own forward and backward pass:</p>
+<pre>forward:   with torch.no_grad():              # build no graph, store nothing
+               for blk in blocks:  a, b = b, a + 2h * f(b)
+           keep only (a, b) at the top
+
+backward:  for blk in reversed(blocks):       # walk down
+               y   = f(a)          # run this one layer again, with gradients on
+               prev = b - 2h * y   # rebuild the earlier state by subtracting
+               grads = autograd.grad(y, ...)  # this layer's gradients
+               # the layer's working numbers are dropped here</pre>
+<pre>parameters: 22,467,200 (training state 343 MiB)</pre>
+
+<h3>Group 4 · Gates (Cells 7–9) · 1–2 minutes · stop points</h3>
+<p>Each gate prints <code>[PASS]</code> or <code>[FAIL]</code>. A failure stops the notebook on purpose.</p>
+<div class="tblwrap"><table>
+<tr><th>gate</th><th>what it does</th><th>what to expect</th></tr>
+<tr><td><b>A</b> (Cell 7)</td><td>tiny model, double precision, CPU: plain autograd vs our backward pass, all three stacks</td><td>3 × PASS, differences around 1e-16 (same as the CPU test)</td></tr>
+<tr><td><b>B</b> (Cell 8)</td><td>the same with dropout switched on: the gradients <em>must</em> now disagree</td><td>2 × PASS "bug caught", differences of a few percent</td></tr>
+<tr><td><b>C</b> (Cell 9)</td><td>rebuilt states vs true states in fp32; then, on the GPU, the real-size model under fp16 autocast</td><td>fp32 errors around 1e-7; <b>new on the GPU:</b> gradient cosine vs plain autograd above 0.999</td></tr>
+</table></div>
+<p>The fp16 line in Gate C is the first real test of 16-bit arithmetic with our backward pass. If it fails, that is the most useful thing the smoke run can tell us.</p>
+
+<h3>Group 5 · The training loop and the sweep (Cells 10–11) · smoke 2&ndash;4 min, full 6&ndash;10 min</h3>
+<p><b>Cell 10</b> defines <code>train_run()</code>, used by every run: AdamW, warm-up then cosine learning rate, fp16 autocast with loss scaling, gradient clipping at 1.0. It prints one line per evaluation. <b>Speed</b> is timed on the GPU clock over training steps only (not the first 10 steps, not the evaluations). <b>Peak memory</b> is PyTorch's own counter. It saves a checkpoint every 8 minutes, and <code>cached_run()</code> makes a finished run reload instead of retraining.</p>
+<p><b>Cell 11</b> runs short training runs to pick the step size <code>h</code>: midpoint at 0.25, 0.5 and 1.0, two-stream at 0.5 and 1.0, then the side check that picks midpoint's start. It ends with a small table, "&larr; chosen" next to the winners, and one sentence saying which start run B will use. The rule, fixed on 23 Sep before any full-run result: the Euler start stays unless the plain start is better by more than 0.02.</p>
+<pre>    sweep_mid_h0.25   step 60/60  tokens 1.0M  train 7.9  val 7.9  ... tok/s
+  stack         h   val loss
+  midpoint   0.25    ...
+  midpoint    1.0    ...   &lt;- chosen
+  side check, midpoint h=...: Euler start ... vs plain start ... -&gt; ...
+  run B will use the ... start: ...</pre>
+<p><b>In the smoke run</b> these runs are only 60 steps, so the losses are high (around 7 or more) and the choice of <code>h</code> means little. That is fine; the smoke run is testing that the code works. The full run uses 300 steps, and that choice counts.</p>
+
+<h3>Group 6 · The memory probe (Cell 12) · about 5&ndash;10 minutes</h3>
+<p><code>_largest_batch()</code> tries one full training step at batch 8, 16, 32, 64&hellip; until it runs out of memory, then narrows the gap. Running out of memory is <b>expected and caught</b> by <code>_try_step()</code>, so you will not see red errors. Then it measures one step at each depth in <code>ProbeCfg.depths</code>.</p>
+<pre>  largest batch, ordinary  :  ...
+  largest batch, midpoint  :  ...
+  largest batch, two-stream:  ...
+  midpoint fits ...x the ordinary model's largest batch
+  ordinary   grows ... MiB per extra layer
+  midpoint   grows ... MiB per extra layer</pre>
+<p><b>What to expect, from the smoke run:</b> the smoke probe measured 144 for the ordinary model, 664 for midpoint and 912 for two-stream. The full run should differ in two ways, both from the 23 Sep fixes. <b>Midpoint should rise to about two-stream's figure</b>, because its Euler start no longer stores a layer. <b>All three should drop a little</b>, because the probe now measures the second step, when Adam's running averages exist, as in real training. For memory against depth, the ordinary model should still grow by roughly 190 MiB per extra layer; the reversible ones should now grow by about 10&ndash;19 MiB instead of the smoke run's 4.7, because that layer's optimizer state is now counted.</p>
+
+<h3>Group 7 · The runs (Cells 13–14) · smoke 2&ndash;4 min, full about an hour</h3>
+<p><b>Cell 13</b> trains runs A, B and C at batch 32, then prints the verdict on which reversible variant trained better, worked out from the final validation losses. If they are within 0.02 of each other it says "too close to call" and uses midpoint.</p>
+<p><b>Cell 14</b> sets run D's batch to the smaller of the step limit and 90% of the probe's largest batch, scales the learning rate, and trains it.</p>
+<div class="tblwrap"><table>
+<tr><th></th><th>smoke</th><th>full</th></tr>
+<tr><td>tokens per run</td><td class="num">2M</td><td class="num">50M</td></tr>
+<tr><td>steps, runs A–C</td><td class="num">122</td><td class="num">3,051</td></tr>
+<tr><td>run D batch (step limit)</td><td class="num">96</td><td class="num">240</td></tr>
+<tr><td>run D steps</td><td class="num">40</td><td class="num">406</td></tr>
+<tr><td>run D learning rate</td><td class="num">1.73e-3</td><td class="num">2.74e-3</td></tr>
+<tr><td>time per run</td><td>under a minute</td><td>about 10&ndash;20 minutes</td></tr>
+</table></div>
+
+<h3>Group 8 · Results (Cells 15–17) · under a minute</h3>
+<p><b>Cell 15</b> prints the table the brief asks for (final loss, tokens/s, peak memory per run), plus time to reach run A's final loss and the cost at a public T4 price. The sentences under the table are generated from the numbers, never written in advance. <b>Cell 16</b> saves four figures. <b>Cell 17</b> prints every check, then writes <code>summary.json</code>, <code>RESULTS.md</code> and the zip.</p>
+<pre>ACCEPTANCE: 12/12 passed
+bundle: /content/drive/MyDrive/era5_session13/outputs/smoke/era5s13_outputs.zip</pre>
+<p>On a GPU nothing should be skipped, so expect <b>12/12</b>.</p>
+
+<h3>If something goes wrong</h3>
+<div class="tblwrap"><table>
+<tr><th>you see</th><th>what it means</th><th>what to do</th></tr>
+<tr><td><code>device: cpu</code> in Cell 1</td><td>no GPU runtime</td><td>Runtime → Change runtime type → T4 GPU, then run all</td></tr>
+<tr><td>Colab disconnects</td><td>normal on the free tier</td><td>reconnect and run all; finished work reloads, an unfinished run resumes</td></tr>
+<tr><td>a <code>[FAIL]</code> line in a gate</td><td>the code is wrong somewhere</td><td>stop and send me that cell's output</td></tr>
+<tr><td>out of memory in Cells 13&ndash;14</td><td>the probe's number was too optimistic</td><td>send me the output; I lower the safety margin</td></tr>
+<tr><td>FineWeb download errors in Cell 4</td><td>Hugging Face busy or rate-limited</td><td>run the cell again; it restarts cleanly</td></tr>
+<tr><td>Drive permission popup</td><td>normal, first run only</td><td>allow it; without Drive a disconnect loses finished runs</td></tr>
+</table></div>
+
+<h3>What to send back</h3>
+<ul>
+<li><b>After the smoke run:</b> the output of the last cell is enough. If anything failed, the output of the cell that failed.</li>
+<li><b>After the full run:</b> the zip <code>MyDrive/era5_session13/outputs/era5s13_outputs.zip</code> and the executed notebook (File → Download → .ipynb). I build the README and the write-up from those.</li>
+</ul>
+
+
+</div>

@@ -9,6 +9,16 @@
 
 Run on a Colab **Tesla T4**. Acceptance checks: **12/12 passed**. Every number below is generated from [`outputs/summary.json`](outputs/summary.json) by [`tools/make_readme.py`](tools/make_readme.py); none is typed by hand.
 
+## Reports
+
+Each report is published as a web page, and a standalone copy is in `docs/` to open from disk.
+
+| report | what it covers | published | local copy |
+|---|---|---|---|
+| **Results report: The Reversible Stack** | the headline numbers, the full loop from web pages to results in diagrams, this write-up, and every notebook cell with its output | [open](https://claude.ai/artifact/9rvTQZyFWKezFH95jsJUHN) | [`docs/session13_walkthrough.html`](docs/session13_walkthrough.html) |
+| **Session report: Model and Pipeline Parallel** | the lesson and transcript in plain English: tensor, sequence, pipeline and context parallelism with worked examples, a glossary, and the approach to this assignment | [open](https://claude.ai/artifact/Xyx5GcMBENHgbtCDuKTREg) | [`docs/session13_report.html`](docs/session13_report.html) |
+| **Build plan and decisions** | every decision behind the experiment with its reasons, and the build log | [open](https://claude.ai/artifact/NmnX96FbM59KJnhU6FfFzf) | [`docs/assignment_plan.html`](docs/assignment_plan.html) |
+
 ## The answer in one table
 
 Same model, same 50M tokens in the same order, same starting weights. Only the way the layers are stacked, and in run D the batch size, changes.

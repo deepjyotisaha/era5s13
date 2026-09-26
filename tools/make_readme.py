@@ -28,6 +28,22 @@ def _zip_summary(name):
         return json.loads(z.read("summary.json"))
 
 
+# The published pages. Their links are the only hand-kept values in this file: a URL is not a
+# measurement, and it does not change when the page is republished.
+REPORTS = [
+    ("Results report: The Reversible Stack",
+     "the headline numbers, the full loop from web pages to results in diagrams, this write-up, "
+     "and every notebook cell with its output",
+     "https://claude.ai/artifact/9rvTQZyFWKezFH95jsJUHN", "docs/session13_walkthrough.html"),
+    ("Session report: Model and Pipeline Parallel",
+     "the lesson and transcript in plain English: tensor, sequence, pipeline and context "
+     "parallelism with worked examples, a glossary, and the approach to this assignment",
+     "https://claude.ai/artifact/Xyx5GcMBENHgbtCDuKTREg", "docs/session13_report.html"),
+    ("Build plan and decisions",
+     "every decision behind the experiment with its reasons, and the build log",
+     "https://claude.ai/artifact/NmnX96FbM59KJnhU6FfFzf", "docs/assignment_plan.html"),
+]
+
 SMOKE = _zip_summary("era5s13_outputs_smoke_v1.zip")      # the smoke run, for the engineering notes
 FIRST = _zip_summary("era5s13_outputs_full_v1.zip")        # the original full run, for its wall time
 
@@ -126,6 +142,15 @@ W("")
 W(f"Run on a Colab **{R['meta']['gpu']}**. Acceptance checks: **{acc['passed']}/{acc['total']} passed**. "
   f"Every number below is generated from [`outputs/summary.json`](outputs/summary.json) by "
   f"[`tools/make_readme.py`](tools/make_readme.py); none is typed by hand.")
+W("")
+W("## Reports")
+W("")
+W("Each report is published as a web page, and a standalone copy is in `docs/` to open from disk.")
+W("")
+W("| report | what it covers | published | local copy |")
+W("|---|---|---|---|")
+for name, what, url, local in REPORTS:
+    W(f"| **{name}** | {what} | [open]({url}) | [`{local}`]({local}) |")
 W("")
 W("## The answer in one table")
 W("")
@@ -353,6 +378,7 @@ must = [f4(r["final_val"]) for r in R["results"]] + [f4(r["final_train"]) for r 
        [str(lb["ordinary"]), str(lb["midpoint"]), str(lb["two-stream"]),
         f1(pr["mib_per_layer_ordinary"]), f1(pr["mib_per_layer_midpoint"]),
         f"{acc['passed']}/{acc['total']}", f4(abs(side["diff"]))]
+must += [url for _, _, url, _ in REPORTS] + [local for *_, local in REPORTS]
 missing = [m for m in must if m not in text]
 if missing:
     sys.exit(f"README check FAILED, numbers missing: {missing}")

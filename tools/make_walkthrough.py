@@ -34,7 +34,7 @@ LIST = re.compile(r"^\s*(?:[-*]|\d+\.)\s+")
 IMG = re.compile(r"^!\[([^\]]*)\]\(([^)]+)\)\s*$")
 
 # README chapters that belong to the repo, not the report: the cells section covers them.
-SKIP_CHAPTERS = ("Files", "How to run", "Acceptance checks")
+SKIP_CHAPTERS = ("Reports", "Files", "How to run", "Acceptance checks")
 KICKER = {"The answer in one table": "the answer", "What the brief asked, answered": "the brief",
           "Findings": "findings", "How the reversible stack saves memory": "how it works",
           "The setup": "setup", "Limitations": "limits"}
